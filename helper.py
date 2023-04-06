@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import tempfile
 import seaborn as sns
-
+import numpy as np
 
 def read_data(raw_data):
 
@@ -43,9 +43,16 @@ class FeatureScaling:
         data_scaled = scaler.transform(data)
         data_scaled = pd.DataFrame(data_scaled, columns=data.columns)
 
+        des1, des2 = st.columns(2)
+        with des1:
+            st.text("Before Scaling")
+            st.dataframe(np.round(data.describe(), 1))
+        with des2:
+            st.text("After Standard Scaling")
+            st.dataframe(np.round(data_scaled.describe(), 1))
 
         fig1 = px.scatter(data, x=column1, y=column2, title="Before Sclaing")
-        fig2 = px.scatter(data_scaled, x=column1, y=column2, title="After Scaling")
+        fig2 = px.scatter(data_scaled, x=column1, y=column2, title="After Standard Scaling")
 
         with tempfile.TemporaryDirectory() as path:
             img_path1 = "{}/save.png".format(path)
