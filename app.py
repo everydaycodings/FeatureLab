@@ -10,14 +10,23 @@ engineering_choice = st.selectbox("Select your Feature Engineering Method: ", op
 if upload_file is not None:
 
     data = read_data(upload_file)
-    
+
     st.subheader(" ")
     if engineering_choice == "Feature Scaling":
         st.subheader("You Selected Feature Scaling")
         choice = st.multiselect("Select Your Prefered Choice: ", options=["Standardization", "Normalization"])
         
         if "Standardization" in choice:
-            st.subheader("Effect of Scaling")
+
+            st.subheader("Standardization Scaling")
             column1 = st.selectbox("Select Your First Column: ", options=num_columns(data))
             column2 = st.selectbox("Select Your Second Column: ", options=update_secondary_col(num_columns(data), column1))
+            st.subheader("Effects of Scaling")
             FeatureScaling(data).steandardization(column1, column2)
+        
+        if "Normalization" in choice:
+            st.subheader("Normalization(MinMaxScaling) Scaling")
+            column1 = st.selectbox("Select Your First Column: ", options=num_columns(data))
+            column2 = st.selectbox("Select Your Second Column: ", options=update_secondary_col(num_columns(data), column1))
+            st.subheader("Effects of Scaling")
+            FeatureScaling(data).normalization(column1, column2)
