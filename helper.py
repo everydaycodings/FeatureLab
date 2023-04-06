@@ -93,3 +93,15 @@ class FeatureScaling:
             plt.savefig(img_path)
             st.image(img_path)
         
+        markdown_text = """
+            1) Standardization is a technique used in feature scaling to transform the features of a dataset to have a mean of 0 and a standard deviation of 1. This process involves subtracting the mean of the feature from each value in the feature and then dividing by the standard deviation.
+
+            2) Standardization is useful in machine learning because it ensures that all features are on the same scale, making it easier to compare them and preventing one feature from dominating others. This can improve the performance of some machine learning algorithms that are sensitive to the scale of the features.
+
+            3) Standardization is different from other feature scaling techniques, such as normalization or min-max scaling, which scale the features to a specific range, such as between 0 and 1.
+
+            4) Standardization, as a technique of feature scaling, has several advantages in machine learning, including preventing features from dominating others, improving convergence, making features easier to interpret, working well with many machine learning algorithms, and handling outliers better than some other scaling techniques.
+        """
+        with st.expander("What is Standardization?"):
+            st.markdown(markdown_text)
+        
