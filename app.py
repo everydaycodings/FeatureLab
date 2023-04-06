@@ -8,7 +8,9 @@ upload_file = st.file_uploader("Upload your data: ")
 engineering_choice = st.selectbox("Select your Feature Engineering Method: ", options=["Feature Scaling"])
 
 if upload_file is not None:
+
     data = read_data(upload_file)
+    
     st.subheader(" ")
     if engineering_choice == "Feature Scaling":
         st.subheader("You Selected Feature Scaling")

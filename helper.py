@@ -8,10 +8,10 @@ import seaborn as sns
 import numpy as np
 
 def read_data(raw_data):
+        
+    return pd.read_csv(raw_data)
 
-    data = pd.read_csv(raw_data)
 
-    return data
 
 def cat_columns(data):
     return [feature for feature in data.columns if data[feature].dtypes == "O"]
