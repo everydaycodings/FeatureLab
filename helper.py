@@ -209,30 +209,38 @@ class HandlingMissingValues:
     def __init__(self, data):
         self.data = data
 
-    
-    def handle_numeric_value(self, input_column):
-
-        data = self.data
+    def cca_desc(self):
 
         st.title(" ")
         st.subheader("Complete Case Analysis (CCA)")
 
         cca_markdown_text = """
 
-            Complete case analysis is a statistical method that only includes cases with complete data in the analysis, and excludes any cases with missing data. This method is simple but can lead to a loss of statistical power and potential bias. Other methods, such as multiple imputation, may be better suited for handling missing data in some situations.
+            ###### Complete case analysis is a statistical method that only includes cases with complete data in the analysis, and excludes any cases with missing data. This method is simple but can lead to a loss of statistical power and potential bias. Other methods, such as multiple imputation, may be better suited for handling missing data in some situations.
 
-            Advantage
+            #### Advantage
             1) Easy to implement as no data manipulation required.
             2) Preserves variable distribution.
 
-            Disadvantage
+            #### Disadvantage
             1) It can exclude a large fraction of the original dataset.
             2) Excluded observations(data) could be infomative for the analysis.
             3) When using your model in production, the model will not know how to handle missing data.
-        
+
+            #### Handling Numeric Value
+            1) Distribution of Original Data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
+
+            #### Handling Category Value
+            1) Ratio between Original data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
         """
         with st.expander("What is Complete Case Analysis (CCA)"):
             st.markdown(cca_markdown_text)
+    
+    def handle_numeric_value(self, input_column):
+
+        data = self.data
+
+        self.cca_desc()
         
         st.text("Comparision of Original data with CCA applied data")
         cca_new_data = data[data.columns].dropna()
@@ -249,3 +257,40 @@ class HandlingMissingValues:
             img_path = "{}/save.png".format(path)
             plt.savefig(img_path)
             st.image(img_path)
+        
+
+        st.text("Comparision of Desity PLot between Original data with CCA applied data")
+        fig = plt.figure(figsize=(12, 5))
+        ax = fig.add_subplot(111)
+        data[input_column].plot.density(color='red')
+        cca_new_data[input_column].plot.density(color='green')
+        ax.legend(['Original Data', 'Removed Missing Value'])
+        ax.set_title('Density Plot of {}'.format(input_column))
+        ax.set_xlabel('{}'.format(input_column))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+    
+
+    def handle_categorical_value(self, input_column):
+
+        self.cca_desc()
+
+        data = self.data
+        cca_new_data = data[cat_columns(data)].dropna()
+        
+        st.text("Ratio Comparision between Original Data and CCA applied Data(ratio should be same)")
+        temp = pd.concat([
+            # percentage of observations per category, original data
+            data[input_column].value_counts() / len(data),
+
+            # percentage of observations per category, cca data
+            cca_new_data[input_column].value_counts() / len(cca_new_data)
+        ],
+        axis=1)
+
+        # add column names
+        temp.columns = ['Original Data', 'CCA Data']
+            
+        st.dataframe(temp)

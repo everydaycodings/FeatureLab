@@ -1,6 +1,6 @@
 import streamlit as st
 from helper import FeatureScaling, read_data, update_secondary_col, num_columns, HandlingMissingValues
-
+from helper import cat_columns
 
 st.header("Welcome to FeatureLab")
 
@@ -40,3 +40,8 @@ if upload_file is not None:
 
             column = st.selectbox("Select Your Column: ", options=num_columns(data))
             HandlingMissingValues(data).handle_numeric_value(column)
+        
+        if "Calegorical Value" in choice:
+
+            column = st.selectbox("Select Your Column: ", options=cat_columns(data))
+            HandlingMissingValues(data).handle_categorical_value(column)
