@@ -212,8 +212,7 @@ class HandlingMissingValues:
     def cca_desc(self):
 
         st.title(" ")
-        st.subheader("Complete Case Analysis (CCA)")
-
+        st.title("Handling Missing Numeric Values")
         cca_markdown_text = """
 
             ###### Complete case analysis is a statistical method that only includes cases with complete data in the analysis, and excludes any cases with missing data. This method is simple but can lead to a loss of statistical power and potential bias. Other methods, such as multiple imputation, may be better suited for handling missing data in some situations.
@@ -229,11 +228,20 @@ class HandlingMissingValues:
 
             #### Handling Numeric Value
             1) Distribution of Original Data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
-
+            2) Check the variance, co-variance of the data after applying Mean/Median Imputation, there should not be drastic change in the value between original, mean and median data.
+            3) In case of outliers if there is incrementation of outliers after using Mean/Median Imputaion, then that's a red flag.
+            
             #### Handling Category Value
             1) Ratio between Original data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
+
+            #### When to replace missing values with Mean?
+            1) When the distribution of your data is normal
+
+            #### When to replace missing values with Median?
+            1) When the distribution is Skewed even a littlebit then use median.
+        
         """
-        with st.expander("What is Complete Case Analysis (CCA)"):
+        with st.expander("What is Handling Missing Numeric Values"):
             st.markdown(cca_markdown_text)
     
     def handle_numeric_value(self, input_column):
@@ -241,9 +249,9 @@ class HandlingMissingValues:
         data = self.data
 
         self.cca_desc()
-        
+        st.subheader("Complete Case Analysis (CCA)")
         st.text("Comparision of Original data with CCA applied data")
-        cca_new_data = data[data.columns].dropna()
+        cca_new_data = data[num_columns(data)].dropna()
 
         fig = plt.figure(figsize=(12, 5))
         ax = fig.add_subplot(111)
@@ -271,11 +279,53 @@ class HandlingMissingValues:
             img_path = "{}/save.png".format(path)
             plt.savefig(img_path)
             st.image(img_path)
-    
+
+
+
+        st.subheader("Handling Missing Values Using Mean/Median")
+
+        mean_data = data[input_column].mean()
+        median_data = data[input_column].median()
+        data['median_{}'.format(input_column)] = data[input_column].fillna(median_data)
+        data['mean_{}'.format(input_column)] = data[input_column].fillna(mean_data)
+
+        st.text("Comparision of Desity PLot between Original data with Mean/Median data")
+        fig = plt.figure(figsize=(12, 5))
+        ax = fig.add_subplot(111)
+        data[input_column].plot(kind='kde', ax=ax)
+        data['median_{}'.format(input_column)].plot(kind='kde', ax=ax, color='red')
+        data['mean_{}'.format(input_column)].plot(kind='kde', ax=ax, color='green')
+        lines, labels = ax.get_legend_handles_labels()
+        ax.legend(lines, labels, loc='best')
+        ax.set_xlabel('{}'.format(input_column))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+
+
+        st.text("Change in Outliers after applying Mean/Median Imputation")
+        fig = plt.figure(figsize=(12, 5))
+        data[['{}'.format(input_column), 'median_{}'.format(input_column), 'mean_{}'.format(input_column)]].boxplot()
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+
+
+        st.text("Change In variance after applying Mean/Median Imputation")
+        st.markdown("**Original {} Variance: {}**".format(input_column, np.round(data[input_column].var(), 3)))
+        st.markdown("**{} Variance after Mean Imputation: {}**".format(input_column, np.round(data["mean_{}".format(input_column)].var(), 3)))
+        st.markdown("**{} Variance after Median Imputation: {}**".format(input_column, np.round(data["median_{}".format(input_column)].var(), 3)))
+        
+        st.text("Change In co-variance after applying Mean/Median Imputation")
+        st.dataframe(data.cov())
+        
 
     def handle_categorical_value(self, input_column):
 
         self.cca_desc()
+        st.subheader("Complete Case Analysis (CCA)")
 
         data = self.data
         cca_new_data = data[cat_columns(data)].dropna()
