@@ -37,11 +37,9 @@ if upload_file is not None:
         choice = st.multiselect("Select Your Prefered Choice: ", options=["Numeric Value", "Calegorical Value"])
 
         if "Numeric Value" in choice:
-
             column = st.selectbox("Select Your Column: ", options=num_columns(data))
             HandlingMissingValues(data).handle_numeric_value(column)
         
         if "Calegorical Value" in choice:
-
             column = st.selectbox("Select Your Column: ", options=cat_columns(data))
             HandlingMissingValues(data).handle_categorical_value(column)
