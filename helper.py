@@ -230,9 +230,10 @@ class HandlingMissingValues:
             1) Distribution of Original Data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
             2) Check the variance, co-variance of the data after applying Mean/Median Imputation, there should not be drastic change in the value between original, mean and median data.
             3) In case of outliers if there is incrementation of outliers after using Mean/Median Imputaion, then that's a red flag.
-            
+
             #### Handling Category Value
-            1) Ratio between Original data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
+            1) Distribution of Original Data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
+            2) Ratio between Original data and Transformed data should be same as much as possible, if distribution doesnot match with each other then you should not apply CCA to that perticular Column.
 
             #### When to replace missing values with Mean?
             1) When the distribution of your data is normal
@@ -322,7 +323,7 @@ class HandlingMissingValues:
         st.dataframe(data.cov())
         
 
-    def handle_categorical_value(self, input_column):
+    def handle_categorical_value(self, input_column, num_column):
 
         self.cca_desc()
         st.subheader("Complete Case Analysis (CCA)")
@@ -344,3 +345,25 @@ class HandlingMissingValues:
         temp.columns = ['Original Data', 'CCA Data']
             
         st.dataframe(temp)
+
+        st.subheader("Handling Missing Values Using Mode")
+        st.text("Comparision of Desity PLot between Original data with Mode data")
+        column_mode = data[input_column].mode().values[0]
+
+        fig = plt.figure(figsize=(12, 5))
+        ax = fig.add_subplot(111)
+
+        temp = data[data[input_column]==column_mode][num_column]
+        freq_data = data
+        freq_data[input_column].fillna(column_mode, inplace=True)
+
+        temp.plot(kind='kde', ax=ax)
+        freq_data[freq_data[input_column] == column_mode][num_column].plot(kind='kde', ax=ax, color='red')
+        lines, labels = ax.get_legend_handles_labels()
+        labels = ['Original variable', 'Imputed variable']
+        ax.legend(lines, labels, loc='best')
+        ax.set_xlabel('{}'.format(num_column))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)

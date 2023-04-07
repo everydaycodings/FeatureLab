@@ -41,5 +41,6 @@ if upload_file is not None:
             HandlingMissingValues(data).handle_numeric_value(column)
         
         if "Calegorical Value" in choice:
-            column = st.selectbox("Select Your Column: ", options=cat_columns(data))
-            HandlingMissingValues(data).handle_categorical_value(column)
+            column = st.selectbox("Select Your Main Categorical Column: ", options=cat_columns(data))
+            column2 = st.selectbox("Select Your Optional Numeric Column: ", options=num_columns(data))
+            HandlingMissingValues(data).handle_categorical_value(column, column2)
