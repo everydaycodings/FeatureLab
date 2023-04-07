@@ -201,3 +201,51 @@ class FeatureScaling:
         with st.expander("What is Normalization?"):
             st.markdown(markdown_text)
         
+
+
+
+class HandlingMissingValues:
+
+    def __init__(self, data):
+        self.data = data
+
+    
+    def handle_numeric_value(self, input_column):
+
+        data = self.data
+
+        st.title(" ")
+        st.subheader("Complete Case Analysis (CCA)")
+
+        cca_markdown_text = """
+
+            Complete case analysis is a statistical method that only includes cases with complete data in the analysis, and excludes any cases with missing data. This method is simple but can lead to a loss of statistical power and potential bias. Other methods, such as multiple imputation, may be better suited for handling missing data in some situations.
+
+            Advantage
+            1) Easy to implement as no data manipulation required.
+            2) Preserves variable distribution.
+
+            Disadvantage
+            1) It can exclude a large fraction of the original dataset.
+            2) Excluded observations(data) could be infomative for the analysis.
+            3) When using your model in production, the model will not know how to handle missing data.
+        
+        """
+        with st.expander("What is Complete Case Analysis (CCA)"):
+            st.markdown(cca_markdown_text)
+        
+        st.text("Comparision of Original data with CCA applied data")
+        cca_new_data = data[data.columns].dropna()
+
+        fig = plt.figure(figsize=(12, 5))
+        ax = fig.add_subplot(111)
+        data[input_column].hist(bins=50, ax=ax, density=True, color='red')
+        cca_new_data[input_column].hist(bins=50, ax=ax, color='green', density=True, alpha=0.8)
+        ax.legend(['Original Data', 'Removed Missing Value'])
+        ax.set_title('Distribution of {}'.format(input_column))
+        ax.set_xlabel('{}'.format(input_column))
+
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)

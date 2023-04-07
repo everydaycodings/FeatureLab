@@ -1,11 +1,11 @@
 import streamlit as st
-from helper import FeatureScaling, read_data, update_secondary_col, num_columns
+from helper import FeatureScaling, read_data, update_secondary_col, num_columns, HandlingMissingValues
 
 
 st.header("Welcome to FeatureLab")
 
 upload_file = st.file_uploader("Upload your data: ")
-engineering_choice = st.selectbox("Select your Feature Engineering Method: ", options=["Feature Scaling"])
+engineering_choice = st.selectbox("Select your Feature Engineering Method: ", options=["Feature Scaling", "Handling Missing Values"])
 
 if upload_file is not None:
 
@@ -30,3 +30,13 @@ if upload_file is not None:
             column2 = st.selectbox("Select Your Second Column: ", options=update_secondary_col(num_columns(data), column1))
             st.subheader("Effects of Scaling")
             FeatureScaling(data).normalization(column1, column2)
+    
+
+    elif engineering_choice == "Handling Missing Values":
+
+        choice = st.multiselect("Select Your Prefered Choice: ", options=["Numeric Value", "Calegorical Value"])
+
+        if "Numeric Value" in choice:
+
+            column = st.selectbox("Select Your Column: ", options=num_columns(data))
+            HandlingMissingValues(data).handle_numeric_value(column)
