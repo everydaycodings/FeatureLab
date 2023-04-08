@@ -245,6 +245,75 @@ class HandlingMissingValues:
         with st.expander("What is Handling Missing Numeric Values"):
             st.markdown(cca_markdown_text)
     
+
+    def random_imputation(self, input_type, input_column, num_column):
+
+        st.subheader("Random Imputation") 
+        
+        data = self.data
+
+        data['{}_imputed'.format(input_column)] = data[input_column]
+        data['{}_imputed'.format(input_column)][data['{}_imputed'.format(input_column)].isnull()] = data[input_column].dropna().sample(data[input_column].isnull().sum()).values
+
+        if input_type == "numeric":
+            st.text("Comparision of Original data with Random Imputed data")
+            
+            fig = plt.figure(figsize=(12, 5))
+            sns.distplot(data['{}'.format(input_column)],label='Original {} Column'.format(input_column),hist=False)
+            sns.distplot(data['{}_imputed'.format(input_column)],label = 'Imputed {} Column'.format(input_column),hist=False)
+            plt.legend(loc="best")
+            with tempfile.TemporaryDirectory() as path:
+                img_path = "{}/save.png".format(path)
+                plt.savefig(img_path)
+                st.image(img_path)
+            
+            st.text("Change in Outliers after applying Random Imputation")
+            fig = plt.figure(figsize=(12, 5))
+            data[['{}'.format(input_column), '{}_imputed'.format(input_column)]].boxplot()
+            with tempfile.TemporaryDirectory() as path:
+                img_path = "{}/save.png".format(path)
+                plt.savefig(img_path)
+                st.image(img_path)
+            
+            st.text("Change In variance after applying Random Imputation")
+            st.markdown("**Original {} variable variance: {}**".format(input_column, np.round(data['{}'.format(input_column)].var(), 3)))
+            st.markdown("**{} Variance after random imputation: {}**".format(input_column, np.round(data['{}_imputed'.format(input_column)].var(), 3)))
+
+        elif input_type == "categorical":
+            st.text("Ratio Comparision between Original Data and Random Imputed Data")
+
+            temp = pd.concat(
+                [
+                    data[input_column].value_counts() / len(data[input_column].dropna()),
+                    data['{}_imputed'.format(input_column)].value_counts() / len(data)
+                ],
+                axis=1)
+
+            temp.columns = ['{} Original'.format(input_column), '{} Imputed'.format(input_column)]
+            st.dataframe(temp)
+
+            with tempfile.TemporaryDirectory() as path:
+
+                fig = plt.figure(figsize=(12, 5))
+                
+                for category in data[input_column].dropna().unique():
+                    sns.distplot(data[data[input_column] == category][num_column],hist=False,label=category)
+                plt.legend(loc="best")
+                img_path = "{}/save.png".format(path)
+                plt.savefig(img_path)
+                
+                for category in data['{}_imputed'.format(input_column)].dropna().unique():
+                    sns.distplot(data[data['{}_imputed'.format(input_column)] == category][num_column],hist=False,label=category)
+                img_path1 = "{}/save1.png".format(path)
+                plt.savefig(img_path1)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.image(img_path)
+                with col2:
+                    st.image(img_path1)
+
+
     def handle_numeric_value(self, input_column):
 
         data = self.data
@@ -321,6 +390,9 @@ class HandlingMissingValues:
         
         st.text("Change In co-variance after applying Mean/Median Imputation")
         st.dataframe(data.cov())
+
+
+        self.random_imputation(input_type="numeric", input_column=input_column, num_column=None)
         
 
     def handle_categorical_value(self, input_column, num_column):
@@ -367,3 +439,6 @@ class HandlingMissingValues:
             img_path = "{}/save.png".format(path)
             plt.savefig(img_path)
             st.image(img_path)
+        
+
+        self.random_imputation(input_type="categorical", input_column=input_column, num_column=num_column)
