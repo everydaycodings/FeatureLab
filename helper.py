@@ -462,6 +462,10 @@ class MathamaticalTRansformation:
         info = """
 
             **The benifit or advantage of using mathamatical transformation is that the distribution of your data which is also called PDF(Probability Density Function) is converted to Normal Distribution.**
+            
+            **when to use mathamatical transformation**
+            Mathematical transformations are typically used for non-normally distributed data that needs to be made more symmetrical, while power transformations are more flexible and can handle both positively and negatively skewed data to transform it to a desired level of normality. Box-Cox transformations are commonly used for positively skewed data, while Yeo-Johnson transformations are more flexible and can handle both positive and negative skewness. The choice between these methods depends on the distribution of the original data and the specific goals of the analysis.
+            []()
         """
         with st.expander("What is Mathamatical Transformation?"):
             st.markdown(info)
