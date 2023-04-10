@@ -1,11 +1,11 @@
 import streamlit as st
-from helper import FeatureScaling, read_data, update_secondary_col, num_columns, HandlingMissingValues
+from helper import FeatureScaling, read_data, update_secondary_col, num_columns, HandlingMissingValues, MathamaticalTRansformation
 from helper import cat_columns
 
 st.header("Welcome to FeatureLab")
 
 upload_file = st.file_uploader("Upload your data: ")
-engineering_choice = st.selectbox("Select your Feature Engineering Method: ", options=["Feature Scaling", "Handling Missing Values"])
+engineering_choice = st.selectbox("Select your Feature Engineering Method: ", options=["Feature Scaling", "Handling Missing Values", "Mathamatical Transformation"])
 
 if upload_file is not None:
 
@@ -44,3 +44,9 @@ if upload_file is not None:
             column = st.selectbox("Select Your Main Categorical Column: ", options=cat_columns(data))
             column2 = st.selectbox("Select Your Optional Numeric Column: ", options=num_columns(data))
             HandlingMissingValues(data).handle_categorical_value(column, column2)
+        
+    
+    elif engineering_choice == "Mathamatical Transformation":
+        
+        column = st.selectbox("Select Your Column: ", options=num_columns(data))
+        MathamaticalTRansformation(data).handle_mathamatical_transformation(input_column=column)

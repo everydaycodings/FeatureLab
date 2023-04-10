@@ -6,6 +6,10 @@ import plotly.express as px
 import tempfile
 import seaborn as sns
 import numpy as np
+import scipy.stats as stats
+from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import PowerTransformer
+
 
 def read_data(raw_data):
         
@@ -212,7 +216,7 @@ class HandlingMissingValues:
     def cca_desc(self):
 
         st.title(" ")
-        st.title("Handling Missing Numeric Values")
+        st.title("Handling Missing Values")
         cca_markdown_text = """
 
             ###### Complete case analysis is a statistical method that only includes cases with complete data in the analysis, and excludes any cases with missing data. This method is simple but can lead to a loss of statistical power and potential bias. Other methods, such as multiple imputation, may be better suited for handling missing data in some situations.
@@ -442,3 +446,106 @@ class HandlingMissingValues:
         
 
         self.random_imputation(input_type="categorical", input_column=input_column, num_column=num_column)
+    
+
+
+
+class MathamaticalTRansformation:
+
+    def __init__(self, data):
+        self.data = data
+    
+    def desc(self):
+
+        st.title(" ")
+        st.title("Apply Mathamatical Transformations")
+        info = """
+
+            **The benifit or advantage of using mathamatical transformation is that the distribution of your data which is also called PDF(Probability Density Function) is converted to Normal Distribution.**
+        """
+        with st.expander("What is Mathamatical Transformation?"):
+            st.markdown(info)
+
+
+    def mathamatical_transformation(self, input_column, func, func_desc):
+        
+        data = self.data
+
+        st.text("{} Distribution of {} Column".format(func_desc, input_column))
+        trf = FunctionTransformer(func=func)
+        data_transfromed = trf.fit_transform(data)
+
+        plt.figure(figsize=(12, 5))
+        plt.subplot(121)
+        sns.distplot(data_transfromed[input_column])
+        plt.title('{} {} PDF'.format(func_desc, input_column))
+        plt.subplot(122)
+        stats.probplot(data_transfromed[input_column], dist="norm", plot=plt)
+        plt.title('{} {} QQ Plot'.format(func_desc, input_column))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+
+
+    def power_transformation(self, input_column, func, func_desc):
+        
+        data = self.data
+
+        st.text("Applying {} to {} Column".format(func, input_column))
+
+        if func == "box-cox":
+            pt = PowerTransformer(method='box-cox')
+        elif func == "yeo-johnson":
+            pt = PowerTransformer(method='yeo-johnson')
+
+        data_transformed = pt.fit_transform(data+0.000001)
+        data_transformed = pd.DataFrame(data_transformed,columns=data.columns)
+
+        plt.figure(figsize=(14,4))
+        plt.subplot(121)
+        sns.distplot(data[input_column])
+        plt.title("Original {} Column".format(input_column))
+        plt.subplot(122)
+        sns.distplot(data_transformed[input_column])
+        plt.title("{} Column after applying {}".format(input_column, func_desc))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+
+
+            
+    def handle_mathamatical_transformation(self, input_column):
+
+        data = self.data
+
+        self.desc()
+
+        st.text("Original Distribution of {} Column".format(input_column))
+
+        plt.figure(figsize=(12, 5))
+        plt.subplot(121)
+        sns.distplot(data[input_column])
+        plt.title('{} PDF'.format(input_column))
+        plt.subplot(122)
+        stats.probplot(data[input_column], dist="norm", plot=plt)
+        plt.title('{} QQ Plot'.format(input_column))
+        with tempfile.TemporaryDirectory() as path:
+            img_path = "{}/save.png".format(path)
+            plt.savefig(img_path)
+            st.image(img_path)
+        
+        
+        st.subheader("Function Transformer")
+        self.mathamatical_transformation(input_column, func=np.log1p, func_desc="Log Transformation")
+        self.mathamatical_transformation(input_column, func=lambda x: 1/x, func_desc="Reciprocal Transformation")
+        self.mathamatical_transformation(input_column, func=lambda x:x**(1/2), func_desc="Square Root Transformation")
+        self.mathamatical_transformation(input_column, func=lambda x:x**2, func_desc="Square Transformation")
+        self.mathamatical_transformation(input_column, func=lambda x:x**(1/3), func_desc="Cube Root Transformation")
+        self.mathamatical_transformation(input_column, func=lambda x:x**3, func_desc="Cube Transformation")
+        
+        st.subheader("Power Transformer")
+        self.power_transformation(input_column, func="box-cox", func_desc="box-cox")
+        self.power_transformation(input_column, func="yeo-johnson", func_desc="yeo-johnson")
+
