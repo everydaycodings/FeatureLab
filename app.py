@@ -2,6 +2,17 @@ import streamlit as st
 from helper import FeatureScaling, read_data, update_secondary_col, num_columns, HandlingMissingValues, MathamaticalTRansformation
 from helper import cat_columns
 
+st.set_page_config(
+     page_title="FeatureLab - Choose the best feature for your data",
+     page_icon="🧊",
+     layout="wide",
+     initial_sidebar_state="expanded",
+     menu_items={
+         'Get Help': 'https://github.com/everydaycodings',
+         'About': "github code link: https://github.com/everydaycodings/FeatureLab"
+     }
+)
+
 st.header("Welcome to FeatureLab")
 
 upload_file = st.file_uploader("Upload your data: ")
