@@ -542,7 +542,10 @@ class MathamaticalTRansformation:
         
         st.subheader("Function Transformer")
         self.mathamatical_transformation(input_column, func=np.log1p, func_desc="Log Transformation")
-        self.mathamatical_transformation(input_column, func=lambda x: 1/x, func_desc="Reciprocal Transformation")
+        try:
+            self.mathamatical_transformation(input_column, func=lambda x: 1/x, func_desc="Reciprocal Transformation")
+        except:
+            st.warning("Reciprocal TRansformation Not Working!")
         self.mathamatical_transformation(input_column, func=lambda x:x**(1/2), func_desc="Square Root Transformation")
         self.mathamatical_transformation(input_column, func=lambda x:x**2, func_desc="Square Transformation")
         self.mathamatical_transformation(input_column, func=lambda x:x**(1/3), func_desc="Cube Root Transformation")
